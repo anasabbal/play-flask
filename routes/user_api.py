@@ -1,10 +1,12 @@
 from flask import jsonify, request, Blueprint
 from sqlalchemy.exc import IntegrityError
-from models.user import User
-from command.user_command import UserCommand
-from services.user_service import UserService
-from config.config import db
 
+from command.user_command import UserCommand
+from config.config import db
+from dto.account_info_dto import AccountInfoDto
+from dto.user_dto import UserInfoDTO
+from models.user import User
+from services.user_service import UserService
 
 user_controller = Blueprint('main', __name__)
 user_service = UserService()
@@ -16,13 +18,20 @@ class UserController():
     def get_users():
         try:
             users = User.query.all()
-            user_list = [{
-                'id': user.id,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email,
-                'password': user.password
-            } for user in users]
+
+            user_list = []
+            for user in users:
+                account_info_list = []
+                for account_info in user.account_information:
+                    account_info_dto = AccountInfoDto.toDto(account_info)
+                    account_info_list.append(account_info_dto)
+
+                user_dto = UserInfoDTO(
+                    account_info=account_info_list,
+                    client_type=user.client_type
+                )
+                user_list.append(user_dto.__dict__)
+
             return jsonify(user_list), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500

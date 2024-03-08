@@ -1,8 +1,8 @@
 from flask import Flask
-from routes.user_api import  user_controller
 from flask_migrate import Migrate
-from config.config import db, set_db_configs, create_tables, configure_logging
 
+from config.config import db, set_db_configs, create_tables, configure_logging
+from routes.user_api import user_controller
 
 
 def create_app():

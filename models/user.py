@@ -1,41 +1,38 @@
-from sqlalchemy import Column, String
-from config.config import db
-from command.user_command import UserCommand
-import uuid
 import logging
-import app
-from flask_bcrypt import Bcrypt 
 
+from flask_bcrypt import Bcrypt
+from sqlalchemy import Column, String, Boolean, Enum, ForeignKey
+from sqlalchemy.orm import relationship
+from command.account_info_cmd import AccountInfoCmd
+from config.config import db
+from models import BaseEntity, ClientType, AccountInformation
 
-
-bcrypt = Bcrypt() 
+bcrypt = Bcrypt()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class User(db.Model):
+class User(BaseEntity):
     __tablename__ = 'users'
 
-    id = Column(String(36), primary_key=True, default=uuid.uuid4())
-    first_name = Column(String(10), nullable=False)
-    last_name = Column(String(10), nullable=False)
-    email = Column(String(120), unique=True)
-    password = Column(String(255), nullable=False)
-
+    account_information_id = Column(String, ForeignKey('account_information.id'))
+    account_information = relationship("AccountInformation", back_populates="users")
+    client_type = Column(Enum(ClientType), default=ClientType.PERSON)
+    is_enabled = Column(Boolean, default=False)
+    
 
     # function to create user from command
-    @classmethod
-    def create(cls, user_command: UserCommand):
-        hashed_password = bcrypt.generate_password_hash(user_command.get_password()).decode('utf-8')
-        user = cls(
-            first_name=user_command.get_first_name(),
-            last_name=user_command.get_last_name(),
-            email=user_command.get_email(),
-            password=hashed_password
-        )
-
+    @staticmethod
+    def create_and_save(account_information: AccountInformation):
+        user = User()
+        user.account_information = account_information
         return user
+    
+    @staticmethod
+    def create(cmd: AccountInfoCmd):
+        payload : AccountInformation = AccountInformation.create(cmd)
+        return User.create_and_save(payload)
     
     def save(self):
         db.session.add(self)

@@ -1,8 +1,10 @@
 import logging
-from command.user_command import UserCommand
-from models.user import User
+
 from sqlalchemy.exc import IntegrityError
+
 from config.config import db
+from models.account_info import AccountInformation
+from models.user import User
 from utils.jwt_config import generate_token
 from utils.validate import validate_email
 
@@ -15,10 +17,10 @@ class UserService():
 
     # function to create user
     @staticmethod
-    def create_user(user_command: UserCommand):
+    def create_user(cmd: AccountInformation):
         try:
-            validate_email(user_command.get_email())
-            user = User.create(user_command)
+            validate_email(cmd.get_email())
+            user = User.create(cmd)
             print(user)
             user.save()
             logger.info('User created successfully')
@@ -34,7 +36,7 @@ class UserService():
     
     # login user
     @staticmethod
-    def login(email, password):
+    def login(email: str, password: str):
         # find user by email
         user = User.query.filter_by(email=email).first()
 
