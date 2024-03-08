@@ -9,7 +9,6 @@ from models.user import User
 from services.user_service import UserService
 
 user_controller = Blueprint('main', __name__)
-user_service = UserService()
 
 
 class UserController():
@@ -46,7 +45,7 @@ class UserController():
         try:
             data = request.json
             user_command = UserCommand.create_from_json(data)
-            response, status_code = user_service.create_user(user_command)
+            response, status_code = UserService.create_user(user_command)
             return jsonify(response), status_code
         except IntegrityError:
             db.session.rollback()
@@ -65,5 +64,5 @@ class UserController():
         
         if not email or not password:
             return jsonify({'error': 'Email and password are required'}), 400
-        response, status_code = user_service.login(email, password)
+        response, status_code = UserService.login(email, password)
         return jsonify(response), status_code

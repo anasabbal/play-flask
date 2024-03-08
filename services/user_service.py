@@ -1,7 +1,7 @@
 import logging
 
 from sqlalchemy.exc import IntegrityError
-
+from .account_info_service import AccountInfoService
 from config.config import db
 from models.account_info import AccountInformation
 from models.user import User
@@ -38,11 +38,14 @@ class UserService():
     @staticmethod
     def login(email: str, password: str):
         # find user by email
-        user = User.query.filter_by(email=email).first()
+        account_info = AccountInfoService.find_by_email(email)
 
-        if user and user.check_password(password):
+        if account_info and account_info.check_password(password):
+            user = account_info.user
+            logger.info(f"Login successful for user with email: {email}")
             # generate jwt token
-            token = generate_token(user.id)
+            token = generate_token(email)
             return {'token': token}, 200
         else:
+            logger.warning(f"Login failed for email: {email}")
             return {'error': 'Invalid email or password'}, 401

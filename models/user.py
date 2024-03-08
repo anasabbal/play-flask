@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 class User(BaseEntity):
     __tablename__ = 'users'
 
-    account_information_id = Column(String, ForeignKey('account_information.id'))
-    account_information = relationship("AccountInformation", back_populates="users")
+    account_information_id = Column(String, ForeignKey('account_information.id'), unique=True)
+    account_information = relationship("AccountInformation", back_populates="user", uselist=False)
     client_type = Column(Enum(ClientType), default=ClientType.PERSON)
     is_enabled = Column(Boolean, default=False)
     
@@ -50,7 +50,3 @@ class User(BaseEntity):
             'email': self.email,
             'password': self.password
         }
-    
-    # check password
-    def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)
