@@ -21,7 +21,6 @@ class UserService():
         try:
             validate_email(cmd.get_email())
             user = User.create(cmd)
-            print(user)
             user.save()
             logger.info('User created successfully')
             return {'message': 'User created successfully'}, 201
@@ -41,7 +40,6 @@ class UserService():
         account_info = AccountInfoService.find_by_email(email)
 
         if account_info and account_info.check_password(password):
-            user = account_info.user
             logger.info(f"Login successful for user with email: {email}")
             # generate jwt token
             token = generate_token(email)
