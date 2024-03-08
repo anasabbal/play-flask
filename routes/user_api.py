@@ -3,8 +3,8 @@ from sqlalchemy.exc import IntegrityError
 
 from command.user_command import UserCommand
 from config.config import db
-from dto.account_info_dto import AccountInfoDto
-from dto.user_dto import UserInfoDTO
+from dto import AccountInfoDto
+from dto import UserInfoDTO
 from models.user import User
 from services.user_service import UserService
 
@@ -21,17 +21,22 @@ class UserController():
 
             user_list = []
             for user in users:
-                account_info_list = []
-                for account_info in user.account_information:
-                    account_info_dto = AccountInfoDto.toDto(account_info)
-                    account_info_list.append(account_info_dto)
-
+                account_dto = None
+                if user.account_information:
+                    account_dto = AccountInfoDto.toDto(user.account_information)
                 user_dto = UserInfoDTO(
-                    account_info=account_info_list,
-                    client_type=user.client_type
+                    id=user.id,
+                    version=user.version,
+                    created_at=str(user.created_at),
+                    created_by=user.created_by,
+                    updated_at=str(user.updated_at),
+                    updated_by=user.updated_by,
+                    deleted=user.deleted,
+                    active=user.active,
+                    account_info=account_dto,
+                    client_type=user.client_type.value
                 )
                 user_list.append(user_dto.__dict__)
-
             return jsonify(user_list), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500
