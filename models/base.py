@@ -19,6 +19,6 @@ class BaseEntity(Base ,db.Model):
     created_at = Column(DateTime, default=func.now())
     created_by = Column(String, default="NAS_SYSTEM")
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    updated_by = Column(String, "NAS_SYSTEM")
+    updated_by = Column(String, default="NAS_SYSTEM")
     deleted = Column(Boolean, default=False)
     active = Column(Boolean, default=True)

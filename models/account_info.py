@@ -1,3 +1,4 @@
+from typing import Self
 from flask_bcrypt import Bcrypt
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
@@ -5,6 +6,7 @@ from command.account_info_cmd import AccountInfoCmd
 from models.base import BaseEntity
 
 bcrypt = Bcrypt()
+
 
 
 class AccountInformation(BaseEntity):
@@ -16,17 +18,15 @@ class AccountInformation(BaseEntity):
     email = Column(String)
     password = Column(String)
     user = relationship("User", back_populates="account_information")
-
-
-    @staticmethod
-    def create(command: AccountInfoCmd):
-        account_information = AccountInformation()
-        account_information.first_name = command.first_name
-        account_information.last_name = command.last_name
-        account_information.email = command.email
-        account_information.password = bcrypt.generate_password_hash(command.get_password()).decode('utf-8')
-
-        return account_information
+    
+    @classmethod
+    def create(cls, command: AccountInfoCmd):
+        acc = cls()
+        acc.first_name = command.first_name
+        acc.last_name = command.last_name
+        acc.email = command.email
+        acc.password = bcrypt.generate_password_hash(command.get_password()).decode('utf-8')
+        return cls
 
     def update(self, command):
         self.first_name = command.first_name
