@@ -11,6 +11,7 @@ class UserInfoDTO(BaseDTO):
     account_info: List[AccountInfoDto]
     client_type: ClientType
 
+
     def __init__(self, id: str, version: int, created_at: str, created_by: str,
                  updated_at: str, updated_by: str, deleted: bool, active: bool,
                  account_info: List[AccountInfoDto], client_type: ClientType):
