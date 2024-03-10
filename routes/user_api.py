@@ -8,38 +8,11 @@ from dto import UserInfoDTO
 from models.user import User
 from services.user_service import UserService
 
+
 user_controller = Blueprint('main', __name__)
 
 
 class UserController():
-
-    @user_controller.route('/users', methods=['GET'])
-    def get_users():
-        try:
-            users = User.query.all()
-
-            user_list = []
-            for user in users:
-                account_dto = None
-                if user.account_information:
-                    account_dto = AccountInfoDto.toDto(user.account_information)
-                user_dto = UserInfoDTO(
-                    id=user.id,
-                    version=user.version,
-                    created_at=str(user.created_at),
-                    created_by=user.created_by,
-                    updated_at=str(user.updated_at),
-                    updated_by=user.updated_by,
-                    deleted=user.deleted,
-                    active=user.active,
-                    account_info=account_dto,
-                    client_type=user.client_type.value
-                )
-                user_list.append(user_dto.__dict__)
-            return jsonify(user_list), 200
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
-
     @user_controller.route('/register', methods=['POST'])
     def register_user():
         try:
